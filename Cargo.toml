@@ -1,8 +1,25 @@
 [package]
 name = "solanaFinal"
 version = "0.1.0"
-edition = "2021"
+license = "Apache-2.0"
+homepage = "https://solana.com/"
+edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+borsh = "0.9.3"
+borsh-derive = "0.10.0"
+solana-program = "~1.10.35"
+getrandom = { version = "0.2.8", features = ["custom"] }
+rand = "0.8"
+
+[dev-dependencies]
+solana-program-test = "~1.10.35"
+solana-sdk = "~1.10.35"
+getrandom = { version = "0.2.8", features = ["custom"] }
+rand = "0.8"
+
+[lib]
+name = "solanaFinal"
+crate-type = ["cdylib", "lib"]
