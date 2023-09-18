@@ -8,47 +8,47 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-/// Define el tipo de estado almacenado en las cuentas
+/// Define the type of state stored in accounts
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct GreetingAccount {
-    /// número de saludos
+    /// number of greetings
     pub counter: u32,
 }
 
-// Declarar y exportar el punto de entrada del programa
+// Declare and export the program's entrypoint
 entrypoint!(process_instruction);
 
-// Implementación del punto de entrada del programa
+// Program entrypoint's implementation
 pub fn process_instruction(
-    program_id: &Pubkey, // Clave pública de la cuenta en la que se cargó el programa de saludo
-    accounts: &[AccountInfo], // La cuenta a la que se va a saludar
-    _instruction_data: &[u8], // Ignorado, todas las instrucciones son saludos
+    program_id: &Pubkey, // Public key of the account the hello world program was loaded into
+    accounts: &[AccountInfo], // The account to say hello to
+    _instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
 ) -> ProgramResult {
-    msg!("Hola, nuevo libro de saludos");
+    msg!("Hello World Rust program entrypoint");
 
-    // Iterar las cuentas es más seguro que indexarlas
+    // Iterating accounts is safer than indexing
     let accounts_iter = &mut accounts.iter();
 
-    // Obtener la cuenta a la que se va a saludar
+    // Get the account to say hello to
     let account = next_account_info(accounts_iter)?;
 
-    // La cuenta debe ser propiedad del programa para poder modificar sus datos
+    // The account must be owned by the program in order to modify its data
     if account.owner != program_id {
-        msg!("La cuenta saludada no tiene la identificación de programa correcta");
+        msg!("Greeted account does not have the correct program id");
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    // Incrementar y almacenar la cantidad de veces que se ha saludado a la cuenta
+    // Increment and store the number of times the account has been greeted
     let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
     greeting_account.counter += 1;
     greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
 
-    msg!("¡Saludada {} vez(es)!", greeting_account.counter);
+    msg!("Greeted {} time(s)!", greeting_account.counter);
 
     Ok(())
 }
 
-// Pruebas de integridad
+// Sanity tests
 #[cfg(test)]
 mod test {
     use super::*;
@@ -57,7 +57,6 @@ mod test {
 
     #[test]
     fn test_sanity() {
-        // Preparar datos de prueba
         let program_id = Pubkey::default();
         let key = Pubkey::default();
         let mut lamports = 0;
@@ -75,32 +74,22 @@ mod test {
         );
         let instruction_data: Vec<u8> = Vec::new();
 
-        // Crear un vector de cuentas para la prueba
         let accounts = vec![account];
 
-        // Asegurarse de que el contador de saludos comienza en 0
         assert_eq!(
             GreetingAccount::try_from_slice(&accounts[0].data.borrow())
                 .unwrap()
                 .counter,
             0
         );
-
-        // Llamar al programa una vez
         process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-
-        // Verificar que el contador de saludos se incrementa a 1
         assert_eq!(
             GreetingAccount::try_from_slice(&accounts[0].data.borrow())
                 .unwrap()
                 .counter,
             1
         );
-
-        // Llamar al programa nuevamente
         process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-
-        // Verificar que el contador de saludos se incrementa a 2
         assert_eq!(
             GreetingAccount::try_from_slice(&accounts[0].data.borrow())
                 .unwrap()
@@ -109,6 +98,3 @@ mod test {
         );
     }
 }
-
-
-
