@@ -8,47 +8,47 @@ use solana_program::{
     pubkey::Pubkey,
 };
 
-/// Define the type of state stored in accounts
+/// Define el tipo de estado almacenado en las cuentas
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct GreetingAccount {
-    /// number of greetings
+    /// número de saludos
     pub counter: u32,
 }
 
-// Declare and export the program's entrypoint
+// Declarar y exportar el punto de entrada del programa
 entrypoint!(process_instruction);
 
-// Program entrypoint's implementation
+// Implementación del punto de entrada del programa
 pub fn process_instruction(
-    program_id: &Pubkey, // Public key of the account the hello world program was loaded into
-    accounts: &[AccountInfo], // The account to say hello to
-    _instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
+    program_id: &Pubkey, // Clave pública de la cuenta en la que se cargó el programa de saludo
+    accounts: &[AccountInfo], // La cuenta a la que se va a saludar
+    _instruction_data: &[u8], // Ignorado, todas las instrucciones son saludos
 ) -> ProgramResult {
-    msg!("Hello new sall book");
+    msg!("Hola, nuevo libro de saludos");
 
-    // Iterating accounts is safer than indexing
+    // Iterar las cuentas es más seguro que indexarlas
     let accounts_iter = &mut accounts.iter();
 
-    // Get the account to say hello to
+    // Obtener la cuenta a la que se va a saludar
     let account = next_account_info(accounts_iter)?;
 
-    // The account must be owned by the program in order to modify its data
+    // La cuenta debe ser propiedad del programa para poder modificar sus datos
     if account.owner != program_id {
-        msg!("Greeted account does not have the correct program id");
+        msg!("La cuenta saludada no tiene la identificación de programa correcta");
         return Err(ProgramError::IncorrectProgramId);
     }
 
-    // Increment and store the number of times the account has been greeted
+    // Incrementar y almacenar la cantidad de veces que se ha saludado a la cuenta
     let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
     greeting_account.counter += 1;
     greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
 
-    msg!("Greeted {} time(s)!", greeting_account.counter);
+    msg!("¡Saludada {} vez(es)!", greeting_account.counter);
 
     Ok(())
 }
 
-// Sanity tests
+// Pruebas de integridad
 #[cfg(test)]
 mod test {
     use super::*;
@@ -98,3 +98,4 @@ mod test {
         );
     }
 }
+
